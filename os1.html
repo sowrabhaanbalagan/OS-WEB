@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+      padding: 5px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    input[type="text"] {
+      width: 50px;
+    }
+    input[type="submit"] {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Optimal Page Replacement Algorithm</h2>
+  
+  <label for="frameSize">Enter frame size:</label>
+  <input type="text" id="frameSize">
+  
+  <br>
+  
+  <label for="referenceString">Enter reference string:</label>
+  <input type="text" id="referenceString">
+  
+  <br>
+  
+  <input type="submit" value="Simulate" onclick="simulateOptimalPR()">
+  
+  <br>
+  
+  <table id="resultTable">
+    <tr>
+      <th>Page</th>
+      <th>Frames</th>
+      <th>Page Fault</th>
+    </tr>
+  </table>
+  
+  <script>
+    function simulateOptimalPR() {
+      var frameSizeInput = document.getElementById("frameSize");
+      var referenceStringInput = document.getElementById("referenceString");
+      var resultTable = document.getElementById("resultTable");
+      
+      var frameSize = parseInt(frameSizeInput.value);
+      var referenceString = referenceStringInput.value.split("");
+      
+      resultTable.innerHTML = ""; // Clear previous results
+      
+      var frames = [];
+      var pageFaults = 0;
+      
+      for (var i = 0; i < referenceString.length; i++) {
+        var currentPage = referenceString[i];
+        var pageFault = false;
+        
+        // Check if the page is already in the frames
+        if (frames.includes(currentPage)) {
+          resultTable.innerHTML += "<tr><td>" + currentPage + "</td><td>" + frames.join(",") + "</td><td>No</td></tr>";
+        } else {
+          pageFault = true;
+          
+          if (frames.length < frameSize) {
+            // If there is still space in the frames, add the page
+            frames.push(currentPage);
+          } else {
+            // If there is no space, find the page to be replaced using Optimal PR
+            var indexes = [];
+            
+            for (var j = i + 1; j < referenceString.length; j++) {
+              if (frames.includes(referenceString[j])) {
+                indexes.push(j);
+              }
+            }
+            
+            var indexToReplace = indexes.length > 0 ? indexes[indexes.length - 1] : i + 1;
+            var pageToReplace = referenceString[indexToReplace];
+            
+            var replaceIndex = frames.indexOf(pageToReplace);
+            frames[replaceIndex] = currentPage;
+          }
+          
+          pageFaults++;
+          resultTable.innerHTML += "<tr><td>" + currentPage + "</td><td>" + frames.join(",") + "</td><td>Yes</td></tr>";
+        }
+      }
+      
+      resultTable.innerHTML += "<tr><td colspan='3'>Total Page Faults: " + pageFaults + "</td></tr>";
+    }
+  </script>
+</body>
+</html>

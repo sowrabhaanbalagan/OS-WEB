@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FIFO Page Replacement Algorithm</title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+    body{
+        background-color: lightblue;
+    }
+  </style>
+</head>
+<body>
+  <h1>FIFO Page Replacement Algorithm</h1>
+
+  <label for="frameSize">Enter Frame Size:</label>
+  <input type="number" id="frameSize">
+  <br>
+  <label for="pageString">Enter Page String:</label>
+  <input type="text" id="pageString"><br>
+  <button onclick="runFIFO()">submit</button>
+
+  <h2>Page Faults:</h2>
+  <table id="pageFaultTable">
+    <tr>
+      <th>Reference String</th>
+      <th>Page Fault</th>
+    </tr>
+  </table>
+
+  <script>
+    function runFIFO() {
+      var frameSize = parseInt(document.getElementById("frameSize").value);
+      var pageString = document.getElementById("pageString").value.trim();
+      var referenceString = pageString.split(/\s*,\s*/).map(Number);
+      var pageFaults = 0;
+      var pageFrames = [];
+
+      // Initialize the page frames
+      for (var i = 0; i < frameSize; i++) {
+        pageFrames.push(-1);
+      }
+
+      // Iterate through the reference string
+      for (var i = 0; i < referenceString.length; i++) {
+        var currentPage = referenceString[i];
+        var pageFound = false;
+
+        // Check if the current page is already in the page frames
+        for (var j = 0; j < frameSize; j++) {
+          if (pageFrames[j] === currentPage) {
+            pageFound = true;
+            break;
+          }
+        }
+
+        // If the page is not found in the frames, replace the oldest page
+        if (!pageFound) {
+          pageFrames.shift();
+          pageFrames.push(currentPage);
+          pageFaults++;
+        }
+
+        // Update the page fault table
+        var newRow = document.createElement("tr");
+        var refStringCell = document.createElement("td");
+        var faultCell = document.createElement("td");
+        refStringCell.textContent = referenceString.slice(0, i + 1).join(", ");
+        faultCell.textContent = pageFaults;
+        newRow.appendChild(refStringCell);
+        newRow.appendChild(faultCell);
+        document.getElementById("pageFaultTable").appendChild(newRow);
+      }
+    }
+  </script>
+</body>
+</html>
